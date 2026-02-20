@@ -10,52 +10,40 @@ function checkPin(req: Request) {
 const uuidRegex =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-const allowedBookingStatus = ["pending", "approved", "declined"];
-const allowedPaymentStatus = ["pending", "awaiting_payment", "paid", "declined"];
-
 export async function PATCH(
   req: Request,
   ctx: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
     if (!checkPin(req)) {
-      return NextResponse.json(
-        { success: false, error: "Unauthorized (admin pin)" },
-        { status: 401 }
-      );
+      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
 
     const resolved = (ctx.params as any)?.then
       ? await (ctx.params as Promise<{ id: string }>)
       : (ctx.params as { id: string });
 
-    const id = resolved?.id;
+    const id = resolved.id;
 
     if (!id || !uuidRegex.test(id)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid booking id format." },
-        { status: 400 }
-      );
+      return NextResponse.json({ success: false, error: "Invalid booking id format." }, { status: 400 });
     }
 
-    const body = await req.json().catch(() => ({}));
+    const body = await req.json();
 
-    const booking_status = body?.booking_status ?? undefined;
-    const payment_status = body?.payment_status ?? undefined;
-    const admin_note = body?.admin_note ?? undefined;
-
-    if (booking_status !== undefined && !allowedBookingStatus.includes(booking_status)) {
-      return NextResponse.json({ success: false, error: "Invalid booking_status" }, { status: 400 });
-    }
-
-    if (payment_status !== undefined && !allowedPaymentStatus.includes(payment_status)) {
-      return NextResponse.json({ success: false, error: "Invalid payment_status" }, { status: 400 });
-    }
-
+    // Only allow updating specific fields (prevents accidents)
     const update: any = {};
-    if (booking_status !== undefined) update.booking_status = booking_status;
-    if (payment_status !== undefined) update.payment_status = payment_status;
-    if (admin_note !== undefined) update.admin_note = admin_note;
+
+    if (typeof body.booking_status === "string") update.booking_status = body.booking_status;
+    if (typeof body.payment_status === "string") update.payment_status = body.payment_status;
+    if (typeof body.admin_note === "string" || body.admin_note === null) update.admin_note = body.admin_note;
+
+    // ✅ One-way archive (true only)
+    if (body.archived === true) update.archived = true;
+
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json({ success: false, error: "No valid fields to update." }, { status: 400 });
+    }
 
     const supabase = supabaseServer();
 
@@ -72,9 +60,6 @@ export async function PATCH(
 
     return NextResponse.json({ success: true, booking: data });
   } catch (e: any) {
-    return NextResponse.json(
-      { success: false, error: e?.message || "Unknown error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: e?.message || "Unknown error" }, { status: 500 });
   }
 }

@@ -6,7 +6,7 @@ export default function HomePage() {
     <Shell>
       <div className="grid gap-6">
         <Card>
-          <h1 className="text-3xl font-extrabold tracking-tight">StaySA Business Travel</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight">Tripconnecta Business Travel</h1>
           <p className="mt-2 text-gray-600">
             Curated Gauteng stays for business travellers. Bookings approved within hours. EFT supported.
           </p>

@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
       setMsg("⚠️ Enter PIN");
       return;
     }
-    localStorage.setItem("staysa_admin_pin", pin.trim());
+    localStorage.setItem("Tripconnecta_admin_pin", pin.trim());
     window.location.href = "/admin";
   }
 

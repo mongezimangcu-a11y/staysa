@@ -1,30 +1,42 @@
+"use client";
+
 import Link from "next/link";
-import { Badge } from "./ui";
+import Image from "next/image";
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen">
-      <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <Link href="/" className="text-lg font-extrabold tracking-tight">
-            StaySA <span className="font-semibold text-gray-500">Business Travel</span>
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      <header className="bg-white border-b">
+        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/logo.png"
+              alt="Tripconnecta"
+              width={160}
+              height={40}
+              priority
+            />
           </Link>
-          <nav className="flex items-center gap-3">
-            <Link className="text-sm text-gray-700 hover:underline" href="/listings">Browse</Link>
-            <Link className="text-sm text-gray-700 hover:underline" href="/list-property">List Property</Link>
-            <Link className="text-sm text-gray-700 hover:underline" href="/admin/login">Admin</Link>
-            <Badge>Gauteng MVP</Badge>
+
+          <nav className="flex items-center gap-4 text-sm">
+            <Link href="/listings" className="hover:text-black text-gray-600">
+              Listings
+            </Link>
+            <Link href="/list-property" className="hover:text-black text-gray-600">
+              List Property
+            </Link>
+            <Link href="/admin" className="hover:text-black text-gray-600">
+              Admin
+            </Link>
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
-
-      <footer className="border-t border-gray-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-6 text-sm text-gray-600">
-          Gauteng only (MVP). Secure. Private. EFT supported.
-        </div>
-      </footer>
+      <main className="mx-auto max-w-6xl px-4 py-6">
+        {children}
+      </main>
     </div>
   );
 }
